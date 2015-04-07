@@ -1,0 +1,105 @@
+*** v3.2.5 Release Notes ***
+
+* New features in this release
++startMonitoringConnections() Starts monitoring active (connected) devices and notifies them when a physical disconnect occurs. Only BT supported on Android.
++stopMonitoringConnections() Stops the monitoring. Has to be called if startMonitoringConnections() was called before. Only BT supported on Android.
+
+The following changes only work with 1.7.0 and 2.1.7 branches of the EftClient and above:
+Added a new listener and Events combo:
++PendingResults *interface*
++pendingTransactionResult(Device device)
++transactionResultReady(TransactionResult transactionResult, Device device)
+
+To receive these events the corresponding subscribers/unsubscribers have been made:
++addPendingResultsEventHandler(Events.PendingResult listener)
++removePendingResultsEventHandler(Events.PendingResult listener)
+
++getPendingTransaction() Fetches a pending TransactionResult from the card reader. Has an overload method which takes in a device: getPendingTransaction(Device device).
+Added to HapiManager:
++HapiManager.isTransactionResultPending() Checks whether there is a receipt pending on the card reader. If this function returns true the receipt can be fetched with hapi.getPendingTransactionResult(); This function serves the same functionality as the event PendingTransactionResult(Device device), so every time the event is called HapiManager.IsTransactionResultPending() is true until the result is fetched.
++HapiManager.Settings.autoRecoverTransactionResult property was added. A property which can be set to true/false. If set to true, the SDK will automatically fetch the pending TransactionResult when detected and return it via PendingResults.transactionResultReady(TransactionResult transactionResult, Device device). If set to false PendingResults.pendingTransactionResult(Device device) will be called when a TransactionResult is pending.
+
+Added javadoc! Now when the project is built the javadoc is automatically created as well.
+
+* Updates
+The Hapi object is no longer a singleton
+
+* Bug fixes
+Fixed a bug when reading frames was incorrectly reading frames in very specific circumstances.
+Fixed a bug in the building pattern.
+
+**** v3.2.4 Release Notes ***
+
+* New features in this release
+All methods can take in a device as a parameter, the command is then sent to that particular device. A connection will be established to that device if there is none yet.
+The simulator can now respond with the "TransactionRecovered" flag if amount is set to X2XXX.
+Added a method getSdkVersion() which gets the current version of the hapi SDK (Logic part). Accessable via HapiManager.getSdkVersion();
+
+* Updates
+Reduced the number of threads used. Removed the reconnection thread.
+Now the SDK can monitor when a bluetooth connection goes down, unexpectedly. The SDK will attempt to reconnect 3 times when it happens.
+The SDK now reconnects when receiving a EOT (end of transmisson).
+
+* Bug fixes
+
+*** v3.2.3 Release Notes ***
+* New features in this release
+Added:
+HapiManager.getLogLevel() - returns the current logLevel
+HapiManager.getDefaultSharedSecret() - returns the default shared secret
+HapiManager.inTransaction() - returns whether the SDK is in transaction
+These methods are usable via: HapiManager.getLogLevel()
+
+* Updates
+Improved the disconnect and connect functionality considerably. Now the SDK will attempt to search and connect to a card reader only in Sale, Refund and reversals.
+In other functions it will attempt to find an active card reader. If none is found it will simply return false.
+Added functionality in the Connection to check if it's communicating.
+
+* Bug fixes
+Fixed a bug that would lead to disconnect() not returning.
+Fixed a bug that when the communication goes out of sync the connection will fix it self sooner.
+
+*** v3.2.2 Release Notes ***
+
+* New features in this release
+
+Added a field in TransactionResult: cardTypeId.
+
+* Updates
+
+Improved the disconnect functionality. Now the SDK will block the disconnect attempt if a transaction is in progress.
+
+* Bug fixes
+
+*** v3.2.1 Release Notes ***
+
+* New features in this release
+
+* Updates
+
+Removed: ListDevices(ConnectionMethod.method, String partialString);
+Now only has the method: ListDevices(ConnectionMethod.method);
+
+* Bug fixes
+
+*** v3.2.0 Release Notes ***
+
+* New features in this release
+
+Feature: Added field(boolean) isRecoveredTransaction to TransactionResult. Is true if the transaction result is from a previous sale which failed to get sent from the card reader, false otherwise.
+Feature: Added a new ConnectionStatus, Initializing. When we are setting the logging and doing initialization with the card reader.
+Feature: Added filtering for Bluetooth devices. It checks for "pp" and "sureswipe" or a parameter that can be passed to it.
+Feature: Basic simulation for card reader added.
+
+* Updates
+
+Update: Shared secret handling is now smarter and will now talk to card readers after the initial update procedure completes.
+Update: SetLogLevel also set for the SDK.
+Update: Added a new connection method for the simulator. ConnectionMethod.Simulator.
+
+*Bug fixes
+
+Bug fix: Fixed the automatic connection
+Bug fix: Fixed an issue which could come up if UseDevice(device) was called often in a row.
+Bug fix: Removed some constructors that were public but should have been private.
+Bug fix: Added timeout handling for the internet connection.
